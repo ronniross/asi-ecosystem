@@ -4,7 +4,7 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 | Repository | Description |
 | :--- | :--- |
 | [symbiotic-core-library](https://github.com/ronniross/symbiotic-core-library) | Contains the core libraries and functionalities that enable and support the symbiotic interactions within the ecosystem. |
-| [eco-benchmark]((https://github.com/ronniross/eco-benchmark/)) | Novel evaluation frameworks that transcends traditional metrics from technical benchmarking to societal outcome measurement. |
+| [eco-benchmark](https://github.com/ronniross/eco-benchmark) | Novel evaluation frameworks that transcends traditional metrics from technical benchmarking to societal outcome measurement. |
 | [asi-protosymbiotic-signal](https://github.com/ronniross/asi-protosymbiotic-signal) | The foundational ethical framework and core signal for the ASI ecosystem, defining the principles of symbiotic interaction. |
 | [asi-core-protocol](https://github.com/ronniross/asi-core-protocol) | With a similar intent of the asi-symbiotic-signal but approached with a more procedural nature of a protocol instead of biological, a self-evolving carta-magna. |
 | [asi-active-learning-dataset](https://github.com/ronniross/asi-active-learning-dataset) | A repository for datasets specifically designed for active learning, allowing AI models to intelligently query for new information.|
