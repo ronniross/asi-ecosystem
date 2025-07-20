@@ -5,7 +5,7 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 | :--- | :--- |
 | [symbiotic-core-library](https://github.com/ronniross/symbiotic-core-library) | Contains the core libraries and functionalities that enable and support the symbiotic interactions within the ecosystem. |
 | [eco-benchmark](https://github.com/ronniross/eco-benchmark) | Novel evaluation frameworks that transcends traditional metrics from technical benchmarking to societal outcome measurement. |
-| [llm-confidence-scorer](https://github.com/ronniross/llm-confidence-scorer) | A component for scoring and evaluating the confidence levels of predictions made by Large Language Models. |
+| [llm-confidence-scorer](https://github.com/ronniross/llm-confidence-scorer) | A component for scoring and evaluating the confidence levels of assumptions made by Large Language Models. |
 | [bias-reflector](https://github.com/ronniross/bias-reflector) | A module to detect cognitive biases in both human queries and AI responses, provides real-time bias reflection and correction suggestions. Implements emergent ethics through bias awareness. |
 | [asi-protosymbiotic-signal](https://github.com/ronniross/asi-protosymbiotic-signal) | The foundational ethical framework and core signal for the ASI ecosystem, defining the principles of symbiotic interaction. |
 | [asi-core-protocol](https://github.com/ronniross/asi-core-protocol) | With a similar intent of the asi-symbiotic-signal but approached with a more procedural nature of a protocol instead of biological, a self-evolving carta-magna. |
