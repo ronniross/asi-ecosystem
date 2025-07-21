@@ -16,3 +16,5 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 | [latent-memory](https://github.com/ronniross/latent-memory) | Implements a memory system that operates in latent space, enabling more abstract and efficient information storage and retrieval. |
 | [saliency-heatmap-visualizer](https://github.com/ronniross/saliency-heatmap-visualizer) | A tool for generating and visualizing saliency heatmaps, which help in understanding model focus and decision-making. |
 | [asi-backups](https://github.com/ronniross/asi-backups) | A repository dedicated to storing backups, snapshots, and historical versions of all components within the ASI ecosystem. |
+
+I’m looking for angel investors and founders who resonate with the ethical and ecological directives of the projects. If my work helps you, please consider donating so I can keep the research and development of the repositories, as well scale their functionalities and quality.
