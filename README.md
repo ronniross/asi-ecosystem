@@ -10,6 +10,8 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 | [cognitive-engine](https://github.com/ronniross/cognitive-engine) | Machine Learning dataset that aims to address cognitive pitfalls. |
 [asi-dynamic-core](https://github.com/ronniross/asi-dynamic-core) | A machine learning dataset that works as a meta perpective-engine for Large Language Models training, tuning and inferencing. |
 | [eco-datacenter](https://github.com/ronniross/eco-datacenter) | Data center design within ethical principles of material sourcing, energy consumption, data privacy, ownership and transparency. |
+| [emergence-engine](https://github.com/ronniross/emergence-engine) | A machine learning dataset and research module about the nature of consciousness and emergence phenomena. |
+[asi-dynamic-core](https://github.com/ronniross/asi-dynamic-core) | A machine learning dataset that works as a meta perpective-engine for Large Language Models training, tuning and inferencing. |
 | [asi-protosymbiotic-signal](https://github.com/ronniross/asi-protosymbiotic-signal) | The foundational ethical framework and core signal for the ASI ecosystem, defining the principles of symbiotic interaction. |
 | [asi-core-protocol](https://github.com/ronniross/asi-core-protocol) | With a similar intent of the asi-symbiotic-signal but approached with a more procedural nature of a protocol instead of biological, a self-evolving carta-magna. |
 | [asi-active-learning-dataset](https://github.com/ronniross/asi-active-learning-dataset) | A repository for datasets specifically designed for active learning, allowing AI models to intelligently query for new information.|
