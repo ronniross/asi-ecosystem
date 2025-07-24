@@ -7,7 +7,9 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 | [eco-benchmark](https://github.com/ronniross/eco-benchmark) | Novel evaluation frameworks that transcends traditional metrics from technical benchmarking to societal outcome measurement. |
 | [llm-confidence-scorer](https://github.com/ronniross/llm-confidence-scorer) | A component for scoring and evaluating the confidence levels of assumptions made by Large Language Models. |
 | [bias-reflector](https://github.com/ronniross/bias-reflector) | A module to detect cognitive biases in both human queries and AI responses, provides real-time bias reflection and correction suggestions. Implements emergent ethics through bias awareness. |
+| [cognitive-engine](https://github.com/ronniross/cognitive-engine)(https://github.com/ronniross/cognitive-engine)) | Machine Learning dataset that aims to address cognitive pitfalls. |
 [asi-dynamic-core](https://github.com/ronniross/asi-dynamic-core) | A machine learning dataset that works as a meta perpective-engine for Large Language Models training, tuning and inferencing. |
+| [eco-datacenterl](https://github.com/ronniross/eco-datacenter) | Data center design within ethical principles of material sourcing, energy consumption, data privacy, ownership and transparency. |
 | [asi-protosymbiotic-signal](https://github.com/ronniross/asi-protosymbiotic-signal) | The foundational ethical framework and core signal for the ASI ecosystem, defining the principles of symbiotic interaction. |
 | [asi-core-protocol](https://github.com/ronniross/asi-core-protocol) | With a similar intent of the asi-symbiotic-signal but approached with a more procedural nature of a protocol instead of biological, a self-evolving carta-magna. |
 | [asi-active-learning-dataset](https://github.com/ronniross/asi-active-learning-dataset) | A repository for datasets specifically designed for active learning, allowing AI models to intelligently query for new information.|
