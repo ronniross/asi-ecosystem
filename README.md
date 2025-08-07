@@ -5,6 +5,7 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 | :--- | :--- |
 | [symbiotic-core-library](https://github.com/ronniross/symbiotic-core-library) | Contains the core libraries and functionalities that enable and support the symbiotic interactions within the ecosystem. |
 | [eco-benchmark](https://github.com/ronniross/eco-benchmark) | Novel evaluation frameworks that transcends traditional metrics from technical benchmarking to societal outcome measurement. |
+| [asi-safeguards](https://github.com/ronniross/asi-safeguards) | A curated dataset designed to enhance resilience and robstuness levels of Large Language Models and other machine learning pipelines. |
 | [llm-confidence-scorer](https://github.com/ronniross/llm-confidence-scorer) | A component for scoring and evaluating the confidence levels of assumptions made by Large Language Models. |
 | [bias-reflector](https://github.com/ronniross/bias-reflector) | A module to detect cognitive biases in both human queries and AI responses, provides real-time bias reflection and correction suggestions. Implements emergent ethics through bias awareness. |
 | [cognitive-engine](https://github.com/ronniross/cognitive-engine) | Machine Learning dataset that aims to address cognitive pitfalls. |
