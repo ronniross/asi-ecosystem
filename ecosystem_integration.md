@@ -1,7 +1,8 @@
-# ecosystem integration
+# Ecosystem Integration
 
 ## Repository Structure
 
+```
 asi-ecosystem/
 ├── .git/
 ├── README.md
@@ -9,8 +10,9 @@ asi-ecosystem/
 ├── ecosystem_integration.md
 └── scripts/
     └── clone_ecosystem.sh
+```
 
-## Ecosystem Integration Scripts and wOrkflows
+## Ecosystem Integration Scripts and Workflows
 
 In addition to the hub's organizational structure, I am now incorporating scripts and workflows to integrate its intended functions into the existing information ecosystem.
 
@@ -39,7 +41,7 @@ cd asi-ecosystem
 Execute the script.
 
 ```bash
-./clone_ecosystem.sh
+./scripts/clone_ecosystem.sh
 ```
 
 You will see output in your terminal as it creates the `repositories` folder and clones each project one by one.
