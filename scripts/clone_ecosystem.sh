@@ -7,7 +7,7 @@
 CLONE_DIR="repositories"
 
 # --- Main Execution ---
-echo "🚀 Starting the ASI Ecosystem cloning process..."
+echo "Starting the ASI Ecosystem cloning process..."
 
 # 1. Create the target directory if it doesn't exist.
 if [ -d "$CLONE_DIR" ]; then
