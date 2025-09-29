@@ -1,5 +1,7 @@
 # Ecosystem Integration
 
+A system to seamlessly combine all the separate parts of the project into one cohesive local workspace.
+
 ## Repository Structure
 
 ```
