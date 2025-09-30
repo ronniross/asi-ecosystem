@@ -12,7 +12,7 @@ def run_phase1():
     print("Setting up ASI Ecosystem Integration...")
     
     # Change to app directory
-    os.chdir('/app')
+os.chdir('/app/asi-ecosystem')
     print(f"Current working directory: {os.getcwd()}")
     
     try:
