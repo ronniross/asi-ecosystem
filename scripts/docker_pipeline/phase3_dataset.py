@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 
 # Configuration
-REPOSITORIES_SRC_DIR = Path('/app/asi-ecosystem/repositories')
+REPOSITORIES_SRC_DIR = Path('/app/repositories')
 OUTPUT_DATASET_FILE = Path('/app/output/dataset.txt')
 EXCLUDED_DIRS = ['.git']
 INCLUDED_EXTENSIONS = [
