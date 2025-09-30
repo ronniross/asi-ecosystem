@@ -11,6 +11,15 @@ asi-ecosystem/
 ├── ecosystem_integration.md
 └── scripts/
     └── clone_ecosystem.sh
+    └── docker_pipeline/               # NEW: All Docker files here
+       ├── Dockerfile
+       ├── requirements.txt
+       ├── run_ecosystem_pipeline.py
+       ├── phase1_cloning.py
+       ├── phase2_integrity.py
+       ├── phase3_dataset.py
+       └── start.sh
+└── repositories/    
 ```
 
 ## Ecosystem Integration Scripts and Workflows
