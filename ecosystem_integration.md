@@ -6,7 +6,6 @@ A system to seamlessly combine all the separate parts of the project into one co
 
 ```
 asi-ecosystem/
-├── .git/
 ├── README.md
 ├── requirements.txt
 ├── ecosystem_integration.md
@@ -52,8 +51,8 @@ You will see output in your terminal as it creates the `repositories` folder and
 
 After the script finishes, your `asi-ecosystem` folder will be perfectly organized with all the component repositories neatly placed inside the `repositories` sub-folder.
 
-***ecosystem_integration..ipynb added to the mainbranch.**
+***ecosystem_integration..ipynb added to the mainbranch and now also with many levels of Integrity Check.**
+
 
 Ronni Ross
-
 2025
