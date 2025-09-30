@@ -235,7 +235,7 @@ def run_phase2():
 
     # Configuration
     VERIFICATION_LEVELS = [1, 2, 3, 4]
-    repositories_path = Path('/app/asi-ecosystem/repositories')
+repositories_path = Path('/app/repositories')
 
     if not repositories_path.exists():
         print("Error: repositories folder not found!")
