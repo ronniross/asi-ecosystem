@@ -118,7 +118,7 @@ After the script finishes, your `asi-ecosystem` folder will be perfectly organiz
 
 
 
-# 3 ASI Ecosystem Docker Pipeline - Deployment Guide
+# 3. ASI Ecosystem Docker Pipeline - Deployment Guide
 
 For easier integration, I now share the docker-pipeline for easier experimentation with the ecosystem. You don't need all options but many users may still like Docker the most.
 
