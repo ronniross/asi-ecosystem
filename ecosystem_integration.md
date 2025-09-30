@@ -13,7 +13,7 @@ asi-ecosystem/
     └── clone_ecosystem.sh
 ```
 
-## 1. Ecosystem Integration Scripts and Workflows
+## Ecosystem Integration Scripts and Workflows
 
 In addition to the hub's organizational structure, I am now incorporating scripts and workflows to integrate its intended functions into the existing information ecosystem.
 
