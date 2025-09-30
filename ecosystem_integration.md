@@ -73,7 +73,7 @@ Creates a structured training dataset with:
 
 The goal was to provide a complete pipeline for preparing ASI ecosystem data for machine learning training while ensuring data integrity and proper structure.
 
-## 2. How to Use Clone Script Individually
+# 2. How to Use Clone Script Individually
 
 Here, in case you just need to clone all repositories at once, without entering the jupyter notebook, you can follow:
 
