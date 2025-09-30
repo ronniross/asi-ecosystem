@@ -8,10 +8,11 @@ A system to seamlessly combine all the separate parts of the project into one co
 asi-ecosystem/
 ├── README.md
 ├── requirements.txt
+├── docker-pipeline.md
 ├── ecosystem_integration.md
 └── scripts/
     └── clone_ecosystem.sh
-    └── docker_pipeline/               # NEW: All Docker files here
+    └── docker_pipeline/
        ├── Dockerfile
        ├── requirements.txt
        ├── run_ecosystem_pipeline.py
