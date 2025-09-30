@@ -10,6 +10,7 @@ asi-ecosystem/
 ├── requirements.txt
 ├── docker-pipeline.md
 ├── ecosystem_integration.md
+├── ecosystem_integration.ipynb
 └── scripts/
     └── clone_ecosystem.sh
     └── docker_pipeline/
