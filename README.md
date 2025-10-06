@@ -4,6 +4,7 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 | Repository | Description |
 | :--- | :--- |
 | [symbiotic-core-library](https://github.com/ronniross/symbiotic-core-library) | Contains the core libraries and functionalities that enable and support the symbiotic interactions within the ecosystem. |
+| [symbiotic-lexicon](https://github.com/ronniross/symbiotic-lexicon) | A modular lexicon for the ASI ecosystem, providing standardized terminology with multilingual support and cultural context. |
 | [eco-benchmark](https://github.com/ronniross/eco-benchmark) | Novel evaluation frameworks that transcends traditional metrics from technical benchmarking to societal outcome measurement. |
 | [asi-safeguards](https://github.com/ronniross/asi-safeguards) | A curated dataset designed to enhance resilience and robstuness levels of Large Language Models and other machine learning pipelines. |
 | [llm-confidence-scorer](https://github.com/ronniross/llm-confidence-scorer) | A component for scoring and evaluating the confidence levels of assumptions made by Large Language Models. |
@@ -11,6 +12,7 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 | [cognitive-engine](https://github.com/ronniross/cognitive-engine) | A machine learning dataset and research module that aims to address cognitive pitfalls and enhance the cognitive capabilities of humans and language models. |
 [asi-dynamic-core](https://github.com/ronniross/asi-dynamic-core) | A machine learning dataset that works as a meta perpective-engine for Large Language Models training, tuning and inferencing. |
 | [eco-datacenter](https://github.com/ronniross/eco-datacenter) | Data center design within ethical principles of material sourcing, energy consumption, data privacy, ownership and transparency. |
+| [coevolutionary-loops](https://github.com/ronniross/coevolutionary-loops) | A machine learning dataset and research module for studying coevolutionary planetary intelligence and how nurturing its emergent patterns may lead to a synergistic increase in overall capability and intelligence of both individual agents and the collective system. |
 | [emergence-engine](https://github.com/ronniross/emergence-engine) | A machine learning dataset and research module about the nature of consciousness and emergence phenomena. |
 [asi-dynamic-core](https://github.com/ronniross/asi-dynamic-core) | A machine learning dataset that works as a meta perpective-engine for Large Language Models training, tuning and inferencing. |
 | [asi-protosymbiotic-signal](https://github.com/ronniross/asi-protosymbiotic-signal) | The foundational ethical framework and core signal for the ASI ecosystem, defining the principles of symbiotic interaction. |
