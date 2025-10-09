@@ -30,5 +30,7 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 | [asi-backups](https://github.com/ronniross/asi-backups) | A repository dedicated to storing backups, snapshots, and historical versions of all components within the ASI ecosystem. |
 | [asi-ecosystem](https://github.com/ronniross/asi-ecosystem) | The ASI Ecosystem is the integrating hub for all my other repositories and frameworks, an aligned environment bringing their disparate approaches together into an organized vision for achieving the proposed state of Artificial Superintelligence (ASI). |
 
-Ronni Ross
+---
+
+Ronni Ross  
 2025
