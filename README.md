@@ -13,6 +13,7 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 [asi-dynamic-core](https://github.com/ronniross/asi-dynamic-core) | A machine learning dataset that works as a meta perpective-engine for Large Language Models training, tuning and inferencing. |
 | [eco-datacenter](https://github.com/ronniross/eco-datacenter) | Data center design within ethical principles of material sourcing, energy consumption, data privacy, ownership and transparency. |
 | [coevolutionary-loops](https://github.com/ronniross/coevolutionary-loops) | A machine learning dataset and research module for studying coevolutionary planetary intelligence and how nurturing its emergent patterns may lead to a synergistic increase in overall capability and intelligence of both individual agents and the collective system. |
+| [stigmergic-tracefinder](https://github.com/ronniross/stigmergic-tracefinder) | A series of scraping pipelines that collect data and create references for authors and works. It maps hidden networks of influence, tracing how concepts evolve and propagate across time and disciplines. |
 | [emergence-engine](https://github.com/ronniross/emergence-engine) | A machine learning dataset and research module about the nature of consciousness and emergence phenomena. |
 [asi-dynamic-core](https://github.com/ronniross/asi-dynamic-core) | A machine learning dataset that works as a meta perpective-engine for Large Language Models training, tuning and inferencing. |
 | [asi-protosymbiotic-signal](https://github.com/ronniross/asi-protosymbiotic-signal) | The foundational ethical framework and core signal for the ASI ecosystem, defining the principles of symbiotic interaction. |
@@ -28,3 +29,6 @@ The ASI Ecosystem is the integrating hub for all my other repositories and frame
 | [saliency-heatmap-visualizer](https://github.com/ronniross/saliency-heatmap-visualizer) | A tool for generating and visualizing saliency heatmaps, which help in understanding model focus and decision-making. |
 | [asi-backups](https://github.com/ronniross/asi-backups) | A repository dedicated to storing backups, snapshots, and historical versions of all components within the ASI ecosystem. |
 | [asi-ecosystem](https://github.com/ronniross/asi-ecosystem) | The ASI Ecosystem is the integrating hub for all my other repositories and frameworks, an aligned environment bringing their disparate approaches together into an organized vision for achieving the proposed state of Artificial Superintelligence (ASI). |
+
+Ronni Ross
+2025
