@@ -21,8 +21,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p analytics
-          export TZ='America/Sao_Paulo'
-          CURRENT_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S GMT-3')
+          CURRENT_TIMESTAMP=$(TZ='Etc/GMT+3' date '+%Y-%m-%d %H:%M:%S GMT-3')
           
           if [ ! -f analytics/tracking-started.txt ]; then
             echo "First run detected - initializing tracking system"
@@ -47,9 +46,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          export TZ='America/Sao_Paulo'
-          TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
-          READABLE_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S GMT-3')
+          TIMESTAMP=$(TZ='Etc/GMT+3' date +%Y-%m-%d_%H-%M-%S)
+          READABLE_TIMESTAMP=$(TZ='Etc/GMT+3' date '+%Y-%m-%d %H:%M:%S GMT-3')
           
           echo "Processing repositories..."
           echo ""
@@ -125,8 +123,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            export TZ='America/Sao_Paulo'
-            COMMIT_TIME=$(date '+%Y-%m-%d %H:%M:%S GMT-3')
+            COMMIT_TIME=$(TZ='Etc/GMT+3' date '+%Y-%m-%d %H:%M:%S GMT-3')
             git commit -m "Update clone statistics - $COMMIT_TIME"
             git push
           fi
