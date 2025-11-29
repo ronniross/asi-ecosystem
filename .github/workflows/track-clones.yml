@@ -119,28 +119,40 @@ jobs:
             AGGREGATE_UNIQUE=$((AGGREGATE_UNIQUE + UNIQUE_WITH_BASELINE))
             
             # Create enhanced data file
-            cat > "analytics/$REPO_NAME/clones_$TIMESTAMP.json" << EOF
+            cat > "analytics/$REPO_NAME/clones_$TIMESTAMP.json" << 'DATAEOF'
 {
-  "repository": "$REPO_FULL_NAME",
-  "timestamp": "$READABLE_TIMESTAMP",
-  "tracking_started": "$TRACKING_STARTED",
+  "repository": "REPO_PLACEHOLDER",
+  "timestamp": "TIMESTAMP_PLACEHOLDER",
+  "tracking_started": "TRACKING_PLACEHOLDER",
   "current_period": {
-    "total_clones": $CURRENT_TOTAL,
-    "unique_clones": $CURRENT_UNIQUE,
+    "total_clones": CURRENT_TOTAL_PLACEHOLDER,
+    "unique_clones": CURRENT_UNIQUE_PLACEHOLDER,
     "note": "Last 14 days as per GitHub API"
   },
   "baseline": {
-    "total_clones": $BASELINE_TOTAL,
-    "unique_clones": $BASELINE_UNIQUE
+    "total_clones": BASELINE_TOTAL_PLACEHOLDER,
+    "unique_clones": BASELINE_UNIQUE_PLACEHOLDER
   },
   "cumulative": {
-    "total_clones": $TOTAL_WITH_BASELINE,
-    "unique_clones": $UNIQUE_WITH_BASELINE,
+    "total_clones": TOTAL_PLACEHOLDER,
+    "unique_clones": UNIQUE_PLACEHOLDER,
     "note": "Current period + baseline from tracking start"
   },
-  "raw_api_response": $RESPONSE
+  "raw_api_response": RESPONSE_PLACEHOLDER
 }
-EOF
+DATAEOF
+            
+            # Replace placeholders
+            sed -i "s|REPO_PLACEHOLDER|$REPO_FULL_NAME|g" "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+            sed -i "s|TIMESTAMP_PLACEHOLDER|$READABLE_TIMESTAMP|g" "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+            sed -i "s|TRACKING_PLACEHOLDER|$TRACKING_STARTED|g" "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+            sed -i "s|CURRENT_TOTAL_PLACEHOLDER|$CURRENT_TOTAL|g" "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+            sed -i "s|CURRENT_UNIQUE_PLACEHOLDER|$CURRENT_UNIQUE|g" "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+            sed -i "s|BASELINE_TOTAL_PLACEHOLDER|$BASELINE_TOTAL|g" "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+            sed -i "s|BASELINE_UNIQUE_PLACEHOLDER|$BASELINE_UNIQUE|g" "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+            sed -i "s|TOTAL_PLACEHOLDER|$TOTAL_WITH_BASELINE|g" "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+            sed -i "s|UNIQUE_PLACEHOLDER|$UNIQUE_WITH_BASELINE|g" "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+            sed -i "s|RESPONSE_PLACEHOLDER|$RESPONSE|g" "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
             
             echo "  Current: $CURRENT_TOTAL total, $CURRENT_UNIQUE unique"
             echo "  Cumulative: $TOTAL_WITH_BASELINE total, $UNIQUE_WITH_BASELINE unique"
@@ -149,16 +161,21 @@ EOF
           done < extracted_repos.txt
           
           # Create aggregate summary
-          cat > "analytics/aggregate_$TIMESTAMP.json" << EOF
+          cat > "analytics/aggregate_$TIMESTAMP.json" << 'AGGEOF'
 {
-  "timestamp": "$READABLE_TIMESTAMP",
+  "timestamp": "TIMESTAMP_PLACEHOLDER",
   "ecosystem_totals": {
-    "total_clones": $AGGREGATE_TOTAL,
-    "unique_clones": $AGGREGATE_UNIQUE,
+    "total_clones": TOTAL_PLACEHOLDER,
+    "unique_clones": UNIQUE_PLACEHOLDER,
     "note": "Sum of all repositories cumulative totals"
   }
 }
-EOF
+AGGEOF
+          
+          # Replace placeholders
+          sed -i "s|TIMESTAMP_PLACEHOLDER|$READABLE_TIMESTAMP|g" "analytics/aggregate_$TIMESTAMP.json"
+          sed -i "s|TOTAL_PLACEHOLDER|$AGGREGATE_TOTAL|g" "analytics/aggregate_$TIMESTAMP.json"
+          sed -i "s|UNIQUE_PLACEHOLDER|$AGGREGATE_UNIQUE|g" "analytics/aggregate_$TIMESTAMP.json"
           
           echo "====================================="
           echo "Ecosystem-wide Statistics"
