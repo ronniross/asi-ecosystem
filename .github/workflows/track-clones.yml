@@ -48,7 +48,7 @@ jobs:
         env:
           # Note: If tracking other peoples' repos or your other repos, 
           # you might need a PAT (Personal Access Token) here instead.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRAFFIC_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
         run: |
           TIMESTAMP=$(TZ='Etc/GMT+3' date +%Y-%m-%d_%H-%M-%S)
           READABLE_TIMESTAMP=$(TZ='Etc/GMT+3' date '+%Y-%m-%d %H:%M:%S GMT-3')
@@ -70,7 +70,7 @@ jobs:
             mkdir -p "analytics/$REPO_NAME"
             
             # API Call
-            RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$REPO_FULL_NAME/traffic/clones")
+            RESPONSE=$(curl -s -H "Authorization: token $TRAFFIC_TOKEN" "https://api.github.com/repos/$REPO_FULL_NAME/traffic/clones")
             
             # Extract current data with default to 0 if empty
             CURRENT_TOTAL=$(echo "$RESPONSE" | grep -o '"count":[0-9]*' | head -1 | cut -d':' -f2)
