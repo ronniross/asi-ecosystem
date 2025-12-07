@@ -13,7 +13,7 @@ jobs:
   track-clones:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write  # REQUIRED to allow git push
 
     steps:
       - name: Checkout repository
@@ -50,7 +50,7 @@ jobs:
           TIMESTAMP=$(TZ='Etc/GMT+3' date +%Y-%m-%d_%H-%M-%S)
           READABLE_TIMESTAMP=$(TZ='Etc/GMT+3' date '+%Y-%m-%d %H:%M:%S GMT-3')
           
-          # Checkpoint baseline (Dec 6th)
+          # HARDCODED CHECKPOINT (Dec 6th Baseline)
           CHECKPOINT_TIMESTAMP="2025-12-06 00:55:13 GMT-3"
           CHECKPOINT_TOTAL=1254
           CHECKPOINT_UNIQUE=966
@@ -59,7 +59,7 @@ jobs:
           echo "Checkpoint Baseline: $CHECKPOINT_TOTAL total / $CHECKPOINT_UNIQUE unique"
           echo ""
           
-          # Initialize daily delta counters
+          # Initialize variables to sum up ONLY the new clones from today
           GLOBAL_DAILY_DELTA_TOTAL=0
           GLOBAL_DAILY_DELTA_UNIQUE=0
           
@@ -71,7 +71,7 @@ jobs:
             echo "Fetching data for: $REPO_FULL_NAME"
             mkdir -p "analytics/$REPO_NAME"
             
-            # Fetch current API data
+            # --- API REQUEST ---
             HTTP_RESPONSE=$(curl -s -w "%{http_code}" -H "Authorization: token $TRAFFIC_TOKEN" "https://api.github.com/repos/$REPO_FULL_NAME/traffic/clones")
             HTTP_BODY=${HTTP_RESPONSE:0:${#HTTP_RESPONSE}-3}
             HTTP_STATUS=${HTTP_RESPONSE:${#HTTP_RESPONSE}-3}
@@ -81,59 +81,89 @@ jobs:
                 continue
             fi
 
-            # Current API window (last 14 days)
+            # Current API Window (Last 14 Days)
             CURRENT_API_TOTAL=$(echo "$HTTP_BODY" | jq '.count // 0')
             CURRENT_API_UNIQUE=$(echo "$HTTP_BODY" | jq '.uniques // 0')
             
-            echo "  > Current API (14-day window): $CURRENT_API_TOTAL total / $CURRENT_API_UNIQUE unique"
+            echo "  > API (Last 14 days): $CURRENT_API_TOTAL total / $CURRENT_API_UNIQUE unique"
             
-            # Load previous state
-            PREVIOUS_FILE=$(ls -t analytics/$REPO_NAME/clones_*.json 2>/dev/null | head -1)
+            # --- LOAD PREVIOUS STATE ---
+            # Find the most recent file (excluding today's timestamp if it exists)
+            PREVIOUS_FILE=$(ls -t analytics/$REPO_NAME/clones_*.json 2>/dev/null | grep -v "$TIMESTAMP" | head -1)
             
+            # Default values
             PREVIOUS_API_TOTAL=0
             PREVIOUS_API_UNIQUE=0
-            PREVIOUS_CUMULATIVE_TOTAL=$CHECKPOINT_TOTAL
-            PREVIOUS_CUMULATIVE_UNIQUE=$CHECKPOINT_UNIQUE
+            PREVIOUS_CUMULATIVE_TOTAL=0
+            PREVIOUS_CUMULATIVE_UNIQUE=0
             TRACKING_STARTED=$(cat analytics/tracking-started.txt)
-
+            
             if [ -f "$PREVIOUS_FILE" ]; then
-                # Load yesterday's API reading and cumulative
+                # Normal case: We have yesterday's file
                 PREVIOUS_API_TOTAL=$(jq '.current_period.total_clones // 0' "$PREVIOUS_FILE")
                 PREVIOUS_API_UNIQUE=$(jq '.current_period.unique_clones // 0' "$PREVIOUS_FILE")
                 PREVIOUS_CUMULATIVE_TOTAL=$(jq '.cumulative.total_clones // 0' "$PREVIOUS_FILE")
                 PREVIOUS_CUMULATIVE_UNIQUE=$(jq '.cumulative.unique_clones // 0' "$PREVIOUS_FILE")
                 TRACKING_STARTED=$(jq -r '.tracking_started' "$PREVIOUS_FILE")
-                echo "  > Previous API reading: $PREVIOUS_API_TOTAL total / $PREVIOUS_API_UNIQUE unique"
-                echo "  > Previous cumulative: $PREVIOUS_CUMULATIVE_TOTAL total / $PREVIOUS_CUMULATIVE_UNIQUE unique"
+                echo "  > Previous Record: $PREVIOUS_FILE"
+                echo "  > Previous API Total: $PREVIOUS_API_TOTAL"
+                echo "  > Previous Cumulative: $PREVIOUS_CUMULATIVE_TOTAL"
             else
-                echo "  > No previous file - using checkpoint baseline"
+                # No previous file found - this is the first tracking for this repo
+                echo "  > No previous record found for this repository"
             fi
-
-            # Calculate delta (only the difference between today and yesterday)
-            if [ "$CURRENT_API_TOTAL" -ge "$PREVIOUS_API_TOTAL" ]; then
+            
+            # --- CALCULATE DELTA (CRITICAL FIX) ---
+            # We ONLY want the difference between today's API reading and yesterday's API reading
+            # This ensures we only count new clones from the last day, not the entire 14-day window
+            
+            DELTA_TOTAL=0
+            DELTA_UNIQUE=0
+            
+            # Calculate delta from API readings (14-day window comparison)
+            if [ "$CURRENT_API_TOTAL" -gt "$PREVIOUS_API_TOTAL" ]; then
                 DELTA_TOTAL=$((CURRENT_API_TOTAL - PREVIOUS_API_TOTAL))
+                echo "  > Delta Calculation: $CURRENT_API_TOTAL (today) - $PREVIOUS_API_TOTAL (yesterday) = +$DELTA_TOTAL"
+            elif [ "$PREVIOUS_API_TOTAL" -eq 0 ]; then
+                # First time tracking this repo or no previous data
+                # We should only add clones if we're starting fresh
+                if [ -f "$PREVIOUS_FILE" ]; then
+                    # We have a previous file but API reading was 0, keep delta at 0
+                    DELTA_TOTAL=0
+                    echo "  > No previous API data, delta set to 0"
+                else
+                    # First ever run for this repo - add current API count
+                    DELTA_TOTAL=$CURRENT_API_TOTAL
+                    echo "  > First run for repo, adding current API count: +$DELTA_TOTAL"
+                fi
             else
-                # API window rolled over (older data fell off), treat as 0 new clones
+                # Current API is less than or equal to previous (window rolled over)
                 DELTA_TOTAL=0
+                echo "  > API window rolled over or no new clones, delta set to 0"
             fi
-
-            if [ "$CURRENT_API_UNIQUE" -ge "$PREVIOUS_API_UNIQUE" ]; then
+            
+            # Same logic for unique clones
+            if [ "$CURRENT_API_UNIQUE" -gt "$PREVIOUS_API_UNIQUE" ]; then
                 DELTA_UNIQUE=$((CURRENT_API_UNIQUE - PREVIOUS_API_UNIQUE))
+            elif [ "$PREVIOUS_API_UNIQUE" -eq 0 ] && [ ! -f "$PREVIOUS_FILE" ]; then
+                DELTA_UNIQUE=$CURRENT_API_UNIQUE
             else
                 DELTA_UNIQUE=0
             fi
             
-            echo "  > Delta calculation: $CURRENT_API_TOTAL - $PREVIOUS_API_TOTAL = +$DELTA_TOTAL new clones"
-
-            # Update cumulative (add only the delta)
+            # --- UPDATE CUMULATIVE ---
+            # Add only the delta to the previous cumulative total
             NEW_CUMULATIVE_TOTAL=$((PREVIOUS_CUMULATIVE_TOTAL + DELTA_TOTAL))
             NEW_CUMULATIVE_UNIQUE=$((PREVIOUS_CUMULATIVE_UNIQUE + DELTA_UNIQUE))
             
-            # Add to global daily counter
+            # Ensure we don't go below checkpoint values for repositories that existed at checkpoint
+            # (This check is mainly for the aggregate total later)
+            
+            # Add to Global Daily Counter
             GLOBAL_DAILY_DELTA_TOTAL=$((GLOBAL_DAILY_DELTA_TOTAL + DELTA_TOTAL))
             GLOBAL_DAILY_DELTA_UNIQUE=$((GLOBAL_DAILY_DELTA_UNIQUE + DELTA_UNIQUE))
 
-            # Save repository JSON
+            # Save Repo JSON
             jq -n \
               --arg repo "$REPO_FULL_NAME" \
               --arg ts "$READABLE_TIMESTAMP" \
@@ -141,55 +171,74 @@ jobs:
               --arg checkpoint "$CHECKPOINT_TIMESTAMP" \
               --argjson c_total "$CURRENT_API_TOTAL" \
               --argjson c_unique "$CURRENT_API_UNIQUE" \
+              --argjson prev_api_total "$PREVIOUS_API_TOTAL" \
+              --argjson prev_api_unique "$PREVIOUS_API_UNIQUE" \
               --argjson delta_total "$DELTA_TOTAL" \
               --argjson delta_unique "$DELTA_UNIQUE" \
               --argjson cum_total "$NEW_CUMULATIVE_TOTAL" \
               --argjson cum_unique "$NEW_CUMULATIVE_UNIQUE" \
-              '{repository: $repo, timestamp: $ts, tracking_started: $start, checkpoint_date: $checkpoint, current_period: {total_clones: $c_total, unique_clones: $c_unique}, daily_delta: {total_clones: $delta_total, unique_clones: $delta_unique}, cumulative: {total_clones: $cum_total, unique_clones: $cum_unique}}' > "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+              '{repository: $repo, timestamp: $ts, tracking_started: $start, checkpoint_date: $checkpoint, current_period: {total_clones: $c_total, unique_clones: $c_unique}, previous_api_period: {total_clones: $prev_api_total, unique_clones: $prev_api_unique}, daily_delta: {total_clones: $delta_total, unique_clones: $delta_unique}, cumulative: {total_clones: $cum_total, unique_clones: $cum_unique}}' > "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
               
-            echo "  > New cumulative: $NEW_CUMULATIVE_TOTAL total / $NEW_CUMULATIVE_UNIQUE unique"
+            echo "  > Saved. New Cumulative: $NEW_CUMULATIVE_TOTAL"
             echo ""
             
           done < extracted_repos.txt
           
-          # Calculate ecosystem totals
+          # --- ECOSYSTEM TOTALS ---
+          
+          # 1. Get Previous Ecosystem Total
           LAST_AGGREGATE_FILE=$(ls -t analytics/aggregate_*.json 2>/dev/null | head -1)
           
           if [ -f "$LAST_AGGREGATE_FILE" ]; then
              PREV_ECOSYSTEM_TOTAL=$(jq '.ecosystem_totals.total_clones // 0' "$LAST_AGGREGATE_FILE")
              PREV_ECOSYSTEM_UNIQUE=$(jq '.ecosystem_totals.unique_clones // 0' "$LAST_AGGREGATE_FILE")
+             echo "Found previous aggregate: $LAST_AGGREGATE_FILE"
+             echo "Previous ecosystem total: $PREV_ECOSYSTEM_TOTAL"
           else
-             # First run - use checkpoint baseline
+             # No previous aggregate, start from checkpoint
              PREV_ECOSYSTEM_TOTAL=$CHECKPOINT_TOTAL
+             PREV_ECOSYSTEM_UNIQUE=$CHECKPOINT_UNIQUE
+             echo "No previous aggregate found, starting from checkpoint: $CHECKPOINT_TOTAL"
+          fi
+          
+          # 2. Ensure we never go below Checkpoint
+          if [ "$PREV_ECOSYSTEM_TOTAL" -lt "$CHECKPOINT_TOTAL" ]; then
+             PREV_ECOSYSTEM_TOTAL=$CHECKPOINT_TOTAL
+          fi
+          if [ "$PREV_ECOSYSTEM_UNIQUE" -lt "$CHECKPOINT_UNIQUE" ]; then
              PREV_ECOSYSTEM_UNIQUE=$CHECKPOINT_UNIQUE
           fi
           
-          # Add only today's delta to previous total
+          # 3. Add ONLY the daily delta to the previous total
           FINAL_ECOSYSTEM_TOTAL=$((PREV_ECOSYSTEM_TOTAL + GLOBAL_DAILY_DELTA_TOTAL))
           FINAL_ECOSYSTEM_UNIQUE=$((PREV_ECOSYSTEM_UNIQUE + GLOBAL_DAILY_DELTA_UNIQUE))
           
-          # Save ecosystem aggregate
+          # 4. Final safeguard: never go below checkpoint
+          if [ "$FINAL_ECOSYSTEM_TOTAL" -lt "$CHECKPOINT_TOTAL" ]; then
+             FINAL_ECOSYSTEM_TOTAL=$CHECKPOINT_TOTAL
+          fi
+          if [ "$FINAL_ECOSYSTEM_UNIQUE" -lt "$CHECKPOINT_UNIQUE" ]; then
+             FINAL_ECOSYSTEM_UNIQUE=$CHECKPOINT_UNIQUE
+          fi
+          
+          # Save Ecosystem JSON
           jq -n \
             --arg ts "$READABLE_TIMESTAMP" \
             --arg checkpoint "$CHECKPOINT_TIMESTAMP" \
             --argjson checkpoint_total "$CHECKPOINT_TOTAL" \
             --argjson checkpoint_unique "$CHECKPOINT_UNIQUE" \
-            --argjson delta_total "$GLOBAL_DAILY_DELTA_TOTAL" \
-            --argjson delta_unique "$GLOBAL_DAILY_DELTA_UNIQUE" \
+            --argjson daily_delta_total "$GLOBAL_DAILY_DELTA_TOTAL" \
+            --argjson daily_delta_unique "$GLOBAL_DAILY_DELTA_UNIQUE" \
             --argjson total "$FINAL_ECOSYSTEM_TOTAL" \
             --argjson unique "$FINAL_ECOSYSTEM_UNIQUE" \
-            '{timestamp: $ts, checkpoint_date: $checkpoint, checkpoint_totals: {total_clones: $checkpoint_total, unique_clones: $checkpoint_unique}, daily_delta: {total_clones: $delta_total, unique_clones: $delta_unique}, ecosystem_totals: {total_clones: $total, unique_clones: $unique}}' > "analytics/aggregate_$TIMESTAMP.json"
+            '{timestamp: $ts, checkpoint_date: $checkpoint, checkpoint_totals: {total_clones: $checkpoint_total, unique_clones: $checkpoint_unique}, daily_delta: {total_clones: $daily_delta_total, unique_clones: $daily_delta_unique}, ecosystem_totals: {total_clones: $total, unique_clones: $unique}}' > "analytics/aggregate_$TIMESTAMP.json"
           
           echo "====================================="
-          echo "ECOSYSTEM SUMMARY"
-          echo "====================================="
-          echo "Previous total: $PREV_ECOSYSTEM_TOTAL"
-          echo "New clones today: +$GLOBAL_DAILY_DELTA_TOTAL"
-          echo "New ecosystem total: $FINAL_ECOSYSTEM_TOTAL"
-          echo ""
-          echo "Previous unique: $PREV_ECOSYSTEM_UNIQUE"
-          echo "New unique today: +$GLOBAL_DAILY_DELTA_UNIQUE"
-          echo "New ecosystem unique: $FINAL_ECOSYSTEM_UNIQUE"
+          echo "DAILY SUMMARY"
+          echo "Previous Ecosystem Total: $PREV_ECOSYSTEM_TOTAL"
+          echo "New Clones Today (Sum of Deltas): +$GLOBAL_DAILY_DELTA_TOTAL"
+          echo "New Ecosystem Total: $FINAL_ECOSYSTEM_TOTAL"
+          echo "Checkpoint Baseline: $CHECKPOINT_TOTAL"
           echo "====================================="
 
       - name: Commit and push data
