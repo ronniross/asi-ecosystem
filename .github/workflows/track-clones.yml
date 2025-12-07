@@ -97,11 +97,23 @@ jobs:
               --arg last_ts "$PREV_LAST_TS" \
               '
               $api[0].clones 
-              | if $last_ts == "" then . else map(select(.timestamp > $last_ts)) end
+              | if ($last_ts == "" or $last_ts == "null") then 
+                  # First run: take everything
+                  .
+                else 
+                  # Subsequent runs: only newer entries
+                  map(select(.timestamp > $last_ts))
+                end
               | {
                   new_total: (map(.count) | add // 0),
                   new_unique: (map(.uniques) | add // 0),
-                  last_ts: (map(.timestamp) | max // $last_ts)
+                  last_ts: (
+                    if length > 0 then
+                      (map(.timestamp) | max)
+                    else
+                      $last_ts
+                    end
+                  )
                 }
               ' > temp_delta.json
             
