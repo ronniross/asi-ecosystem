@@ -101,35 +101,54 @@ jobs:
             
             if [ -f "$CHECKPOINT_FILE" ]; then
               # Read checkpoint values from the Dec 6th snapshot
-              CHECKPOINT_API_TOTAL=$(jq '.current_period.total_clones // 0' "$CHECKPOINT_FILE")
-              CHECKPOINT_API_UNIQUE=$(jq '.current_period.unique_clones // 0' "$CHECKPOINT_FILE")
               CHECKPOINT_CUMULATIVE_TOTAL=$(jq '.cumulative.total_clones // 0' "$CHECKPOINT_FILE")
               CHECKPOINT_CUMULATIVE_UNIQUE=$(jq '.cumulative.unique_clones // 0' "$CHECKPOINT_FILE")
               TRACKING_STARTED=$(jq -r '.tracking_started' "$CHECKPOINT_FILE")
               
-              echo "  > Checkpoint (Dec 6): API was $CHECKPOINT_API_TOTAL/$CHECKPOINT_API_UNIQUE, Cumulative was $CHECKPOINT_CUMULATIVE_TOTAL/$CHECKPOINT_CUMULATIVE_UNIQUE"
+              # Find the most recent snapshot BEFORE today to compare
+              PREVIOUS_FILE=$(ls -t analytics/$REPO_NAME/clones_*.json 2>/dev/null | grep -v "$TIMESTAMP" | head -1)
               
-              # Calculate delta since checkpoint
-              if [ $CURRENT_TOTAL -ge $CHECKPOINT_API_TOTAL ]; then
-                DELTA_TOTAL=$((CURRENT_TOTAL - CHECKPOINT_API_TOTAL))
+              if [ -f "$PREVIOUS_FILE" ]; then
+                # Compare against yesterday's API reading
+                PREVIOUS_API_TOTAL=$(jq '.current_period.total_clones // 0' "$PREVIOUS_FILE")
+                PREVIOUS_API_UNIQUE=$(jq '.current_period.unique_clones // 0' "$PREVIOUS_FILE")
+                PREVIOUS_CUMULATIVE_TOTAL=$(jq '.cumulative.total_clones // 0' "$PREVIOUS_FILE")
+                PREVIOUS_CUMULATIVE_UNIQUE=$(jq '.cumulative.unique_clones // 0' "$PREVIOUS_FILE")
+                
+                echo "  > Previous run: API was $PREVIOUS_API_TOTAL/$PREVIOUS_API_UNIQUE, Cumulative was $PREVIOUS_CUMULATIVE_TOTAL/$PREVIOUS_CUMULATIVE_UNIQUE"
+                echo "  > Current API: $CURRENT_TOTAL/$CURRENT_UNIQUE"
+                
+                # Calculate the delta
+                if [ $CURRENT_TOTAL -ge $PREVIOUS_API_TOTAL ]; then
+                  DELTA_TOTAL=$((CURRENT_TOTAL - PREVIOUS_API_TOTAL))
+                else
+                  # Window rolled over, assume all current are new
+                  DELTA_TOTAL=$CURRENT_TOTAL
+                fi
+                
+                if [ $CURRENT_UNIQUE -ge $PREVIOUS_API_UNIQUE ]; then
+                  DELTA_UNIQUE=$((CURRENT_UNIQUE - PREVIOUS_API_UNIQUE))
+                else
+                  # Window rolled over, assume all current are new
+                  DELTA_UNIQUE=$CURRENT_UNIQUE
+                fi
+                
+                # Add delta to previous cumulative
+                NEW_CUMULATIVE_TOTAL=$((PREVIOUS_CUMULATIVE_TOTAL + DELTA_TOTAL))
+                NEW_CUMULATIVE_UNIQUE=$((PREVIOUS_CUMULATIVE_UNIQUE + DELTA_UNIQUE))
+                
+                echo "  > Delta since last run: +$DELTA_TOTAL total, +$DELTA_UNIQUE unique"
+                echo "  > New cumulative: $NEW_CUMULATIVE_TOTAL total, $NEW_CUMULATIVE_UNIQUE unique"
               else
-                # API value dropped (14-day window rolled), count all current as new
-                DELTA_TOTAL=$CURRENT_TOTAL
+                # Only checkpoint exists, use its cumulative values
+                NEW_CUMULATIVE_TOTAL=$CHECKPOINT_CUMULATIVE_TOTAL
+                NEW_CUMULATIVE_UNIQUE=$CHECKPOINT_CUMULATIVE_UNIQUE
+                DELTA_TOTAL=0
+                DELTA_UNIQUE=0
+                
+                echo "  > Using checkpoint cumulative: $NEW_CUMULATIVE_TOTAL total, $NEW_CUMULATIVE_UNIQUE unique"
+                echo "  > (No previous run to compare)"
               fi
-              
-              if [ $CURRENT_UNIQUE -ge $CHECKPOINT_API_UNIQUE ]; then
-                DELTA_UNIQUE=$((CURRENT_UNIQUE - CHECKPOINT_API_UNIQUE))
-              else
-                # API value dropped (14-day window rolled), count all current as new
-                DELTA_UNIQUE=$CURRENT_UNIQUE
-              fi
-              
-              # Add delta to checkpoint cumulative
-              NEW_CUMULATIVE_TOTAL=$((CHECKPOINT_CUMULATIVE_TOTAL + DELTA_TOTAL))
-              NEW_CUMULATIVE_UNIQUE=$((CHECKPOINT_CUMULATIVE_UNIQUE + DELTA_UNIQUE))
-              
-              echo "  > Delta since checkpoint: +$DELTA_TOTAL total, +$DELTA_UNIQUE unique"
-              echo "  > New cumulative: $NEW_CUMULATIVE_TOTAL total, $NEW_CUMULATIVE_UNIQUE unique"
             else
               # No checkpoint file found - treat current API values as starting point
               TRACKING_STARTED=$(cat analytics/tracking-started.txt)
