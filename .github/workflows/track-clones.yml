@@ -89,32 +89,64 @@ jobs:
             
             echo "  > API returned: $CURRENT_TOTAL total, $CURRENT_UNIQUE unique"
             
-            BASELINE_FILE="analytics/$REPO_NAME/baseline.json"
+            STATE_FILE="analytics/$REPO_NAME/state.json"
             
-            # Initialize or Read Baseline
-            if [ -f "$BASELINE_FILE" ]; then
-              BASELINE_TOTAL=$(jq '.initial_total_clones // 0' "$BASELINE_FILE")
-              BASELINE_UNIQUE=$(jq '.initial_unique_clones // 0' "$BASELINE_FILE")
-              TRACKING_STARTED=$(jq -r '.tracking_started' "$BASELINE_FILE")
-            else
-              BASELINE_TOTAL=$CURRENT_TOTAL
-              BASELINE_UNIQUE=$CURRENT_UNIQUE
-              TRACKING_STARTED=$(cat analytics/tracking-started.txt)
+            # Initialize or Read State
+            if [ -f "$STATE_FILE" ]; then
+              PREV_API_TOTAL=$(jq '.last_api_total // 0' "$STATE_FILE")
+              PREV_API_UNIQUE=$(jq '.last_api_unique // 0' "$STATE_FILE")
+              CUMULATIVE_TOTAL=$(jq '.cumulative_total // 0' "$STATE_FILE")
+              CUMULATIVE_UNIQUE=$(jq '.cumulative_unique // 0' "$STATE_FILE")
+              TRACKING_STARTED=$(jq -r '.tracking_started' "$STATE_FILE")
               
-              # Create baseline using jq to ensure valid JSON
-              jq -n \
-                --arg start "$TRACKING_STARTED" \
-                --argjson total "$BASELINE_TOTAL" \
-                --argjson unique "$BASELINE_UNIQUE" \
-                '{tracking_started: $start, initial_total_clones: $total, initial_unique_clones: $unique}' > "$BASELINE_FILE"
+              # Calculate delta (new clones since last check)
+              # If current < previous, it means the 14-day window dropped old data
+              # In that case, we assume all current clones are new
+              if [ $CURRENT_TOTAL -ge $PREV_API_TOTAL ]; then
+                DELTA_TOTAL=$((CURRENT_TOTAL - PREV_API_TOTAL))
+              else
+                # Window rolled over, count all current as new
+                DELTA_TOTAL=$CURRENT_TOTAL
+              fi
+              
+              if [ $CURRENT_UNIQUE -ge $PREV_API_UNIQUE ]; then
+                DELTA_UNIQUE=$((CURRENT_UNIQUE - PREV_API_UNIQUE))
+              else
+                # Window rolled over, count all current as new
+                DELTA_UNIQUE=$CURRENT_UNIQUE
+              fi
+              
+              # Add delta to cumulative
+              NEW_CUMULATIVE_TOTAL=$((CUMULATIVE_TOTAL + DELTA_TOTAL))
+              NEW_CUMULATIVE_UNIQUE=$((CUMULATIVE_UNIQUE + DELTA_UNIQUE))
+              
+              echo "  > Previous API values: $PREV_API_TOTAL total, $PREV_API_UNIQUE unique"
+              echo "  > Delta (new clones): +$DELTA_TOTAL total, +$DELTA_UNIQUE unique"
+              echo "  > Cumulative: $NEW_CUMULATIVE_TOTAL total, $NEW_CUMULATIVE_UNIQUE unique"
+            else
+              # First run for this repo - use current values as starting point
+              TRACKING_STARTED=$(cat analytics/tracking-started.txt)
+              NEW_CUMULATIVE_TOTAL=$CURRENT_TOTAL
+              NEW_CUMULATIVE_UNIQUE=$CURRENT_UNIQUE
+              DELTA_TOTAL=$CURRENT_TOTAL
+              DELTA_UNIQUE=$CURRENT_UNIQUE
+              
+              echo "  > First run - initializing with current values"
+              echo "  > Cumulative: $NEW_CUMULATIVE_TOTAL total, $NEW_CUMULATIVE_UNIQUE unique"
             fi
             
-            # Math
-            TOTAL_WITH_BASELINE=$((CURRENT_TOTAL + BASELINE_TOTAL))
-            UNIQUE_WITH_BASELINE=$((CURRENT_UNIQUE + BASELINE_UNIQUE))
+            AGGREGATE_TOTAL=$((AGGREGATE_TOTAL + NEW_CUMULATIVE_TOTAL))
+            AGGREGATE_UNIQUE=$((AGGREGATE_UNIQUE + NEW_CUMULATIVE_UNIQUE))
             
-            AGGREGATE_TOTAL=$((AGGREGATE_TOTAL + TOTAL_WITH_BASELINE))
-            AGGREGATE_UNIQUE=$((AGGREGATE_UNIQUE + UNIQUE_WITH_BASELINE))
+            # Update state file with current API values and new cumulative totals
+            jq -n \
+              --arg start "$TRACKING_STARTED" \
+              --argjson last_total "$CURRENT_TOTAL" \
+              --argjson last_unique "$CURRENT_UNIQUE" \
+              --argjson cum_total "$NEW_CUMULATIVE_TOTAL" \
+              --argjson cum_unique "$NEW_CUMULATIVE_UNIQUE" \
+              --arg last_update "$READABLE_TIMESTAMP" \
+              '{tracking_started: $start, last_api_total: $last_total, last_api_unique: $last_unique, cumulative_total: $cum_total, cumulative_unique: $cum_unique, last_updated: $last_update}' > "$STATE_FILE"
             
             # Save Record
             jq -n \
@@ -123,11 +155,11 @@ jobs:
               --arg start "$TRACKING_STARTED" \
               --argjson c_total "$CURRENT_TOTAL" \
               --argjson c_unique "$CURRENT_UNIQUE" \
-              --argjson b_total "$BASELINE_TOTAL" \
-              --argjson b_unique "$BASELINE_UNIQUE" \
-              --argjson cum_total "$TOTAL_WITH_BASELINE" \
-              --argjson cum_unique "$UNIQUE_WITH_BASELINE" \
-              '{repository: $repo, timestamp: $ts, tracking_started: $start, current_period: {total_clones: $c_total, unique_clones: $c_unique}, baseline: {total_clones: $b_total, unique_clones: $b_unique}, cumulative: {total_clones: $cum_total, unique_clones: $cum_unique}}' > "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+              --argjson delta_total "$DELTA_TOTAL" \
+              --argjson delta_unique "$DELTA_UNIQUE" \
+              --argjson cum_total "$NEW_CUMULATIVE_TOTAL" \
+              --argjson cum_unique "$NEW_CUMULATIVE_UNIQUE" \
+              '{repository: $repo, timestamp: $ts, tracking_started: $start, current_period: {total_clones: $c_total, unique_clones: $c_unique}, delta: {total_clones: $delta_total, unique_clones: $delta_unique}, cumulative: {total_clones: $cum_total, unique_clones: $cum_unique}}' > "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
             
             echo "  > Saved record."
             echo ""
