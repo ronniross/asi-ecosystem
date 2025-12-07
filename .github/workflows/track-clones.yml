@@ -51,7 +51,14 @@ jobs:
           TIMESTAMP=$(TZ='Etc/GMT+3' date +%Y-%m-%d_%H-%M-%S)
           READABLE_TIMESTAMP=$(TZ='Etc/GMT+3' date '+%Y-%m-%d %H:%M:%S GMT-3')
           
+          # HARDCODED CHECKPOINT - December 6th baseline
+          CHECKPOINT_TIMESTAMP="2025-12-06 00:55:13 GMT-3"
+          CHECKPOINT_TOTAL=1254
+          CHECKPOINT_UNIQUE=966
+          
           echo "Processing repositories..."
+          echo "Using checkpoint from: $CHECKPOINT_TIMESTAMP"
+          echo "Checkpoint totals: $CHECKPOINT_TOTAL total, $CHECKPOINT_UNIQUE unique"
           echo ""
           
           AGGREGATE_TOTAL=0
@@ -89,77 +96,68 @@ jobs:
             
             echo "  > API returned: $CURRENT_TOTAL total, $CURRENT_UNIQUE unique"
             
-            STATE_FILE="analytics/$REPO_NAME/state.json"
+            # Find the checkpoint file for this repo (from Dec 6th)
+            CHECKPOINT_FILE=$(ls -t analytics/$REPO_NAME/clones_2025-12-06_*.json 2>/dev/null | head -1)
             
-            # Initialize or Read State
-            if [ -f "$STATE_FILE" ]; then
-              PREV_API_TOTAL=$(jq '.last_api_total // 0' "$STATE_FILE")
-              PREV_API_UNIQUE=$(jq '.last_api_unique // 0' "$STATE_FILE")
-              CUMULATIVE_TOTAL=$(jq '.cumulative_total // 0' "$STATE_FILE")
-              CUMULATIVE_UNIQUE=$(jq '.cumulative_unique // 0' "$STATE_FILE")
-              TRACKING_STARTED=$(jq -r '.tracking_started' "$STATE_FILE")
+            if [ -f "$CHECKPOINT_FILE" ]; then
+              # Read checkpoint values from the Dec 6th snapshot
+              CHECKPOINT_API_TOTAL=$(jq '.current_period.total_clones // 0' "$CHECKPOINT_FILE")
+              CHECKPOINT_API_UNIQUE=$(jq '.current_period.unique_clones // 0' "$CHECKPOINT_FILE")
+              CHECKPOINT_CUMULATIVE_TOTAL=$(jq '.cumulative.total_clones // 0' "$CHECKPOINT_FILE")
+              CHECKPOINT_CUMULATIVE_UNIQUE=$(jq '.cumulative.unique_clones // 0' "$CHECKPOINT_FILE")
+              TRACKING_STARTED=$(jq -r '.tracking_started' "$CHECKPOINT_FILE")
               
-              # Calculate delta (new clones since last check)
-              # If current < previous, it means the 14-day window dropped old data
-              # In that case, we assume all current clones are new
-              if [ $CURRENT_TOTAL -ge $PREV_API_TOTAL ]; then
-                DELTA_TOTAL=$((CURRENT_TOTAL - PREV_API_TOTAL))
+              echo "  > Checkpoint (Dec 6): API was $CHECKPOINT_API_TOTAL/$CHECKPOINT_API_UNIQUE, Cumulative was $CHECKPOINT_CUMULATIVE_TOTAL/$CHECKPOINT_CUMULATIVE_UNIQUE"
+              
+              # Calculate delta since checkpoint
+              if [ $CURRENT_TOTAL -ge $CHECKPOINT_API_TOTAL ]; then
+                DELTA_TOTAL=$((CURRENT_TOTAL - CHECKPOINT_API_TOTAL))
               else
-                # Window rolled over, count all current as new
+                # API value dropped (14-day window rolled), count all current as new
                 DELTA_TOTAL=$CURRENT_TOTAL
               fi
               
-              if [ $CURRENT_UNIQUE -ge $PREV_API_UNIQUE ]; then
-                DELTA_UNIQUE=$((CURRENT_UNIQUE - PREV_API_UNIQUE))
+              if [ $CURRENT_UNIQUE -ge $CHECKPOINT_API_UNIQUE ]; then
+                DELTA_UNIQUE=$((CURRENT_UNIQUE - CHECKPOINT_API_UNIQUE))
               else
-                # Window rolled over, count all current as new
+                # API value dropped (14-day window rolled), count all current as new
                 DELTA_UNIQUE=$CURRENT_UNIQUE
               fi
               
-              # Add delta to cumulative
-              NEW_CUMULATIVE_TOTAL=$((CUMULATIVE_TOTAL + DELTA_TOTAL))
-              NEW_CUMULATIVE_UNIQUE=$((CUMULATIVE_UNIQUE + DELTA_UNIQUE))
+              # Add delta to checkpoint cumulative
+              NEW_CUMULATIVE_TOTAL=$((CHECKPOINT_CUMULATIVE_TOTAL + DELTA_TOTAL))
+              NEW_CUMULATIVE_UNIQUE=$((CHECKPOINT_CUMULATIVE_UNIQUE + DELTA_UNIQUE))
               
-              echo "  > Previous API values: $PREV_API_TOTAL total, $PREV_API_UNIQUE unique"
-              echo "  > Delta (new clones): +$DELTA_TOTAL total, +$DELTA_UNIQUE unique"
-              echo "  > Cumulative: $NEW_CUMULATIVE_TOTAL total, $NEW_CUMULATIVE_UNIQUE unique"
+              echo "  > Delta since checkpoint: +$DELTA_TOTAL total, +$DELTA_UNIQUE unique"
+              echo "  > New cumulative: $NEW_CUMULATIVE_TOTAL total, $NEW_CUMULATIVE_UNIQUE unique"
             else
-              # First run for this repo - use current values as starting point
+              # No checkpoint file found - treat current API values as starting point
               TRACKING_STARTED=$(cat analytics/tracking-started.txt)
               NEW_CUMULATIVE_TOTAL=$CURRENT_TOTAL
               NEW_CUMULATIVE_UNIQUE=$CURRENT_UNIQUE
-              DELTA_TOTAL=$CURRENT_TOTAL
-              DELTA_UNIQUE=$CURRENT_UNIQUE
+              DELTA_TOTAL=0
+              DELTA_UNIQUE=0
               
-              echo "  > First run - initializing with current values"
+              echo "  > No checkpoint found - initializing with current values"
               echo "  > Cumulative: $NEW_CUMULATIVE_TOTAL total, $NEW_CUMULATIVE_UNIQUE unique"
             fi
             
             AGGREGATE_TOTAL=$((AGGREGATE_TOTAL + NEW_CUMULATIVE_TOTAL))
             AGGREGATE_UNIQUE=$((AGGREGATE_UNIQUE + NEW_CUMULATIVE_UNIQUE))
             
-            # Update state file with current API values and new cumulative totals
-            jq -n \
-              --arg start "$TRACKING_STARTED" \
-              --argjson last_total "$CURRENT_TOTAL" \
-              --argjson last_unique "$CURRENT_UNIQUE" \
-              --argjson cum_total "$NEW_CUMULATIVE_TOTAL" \
-              --argjson cum_unique "$NEW_CUMULATIVE_UNIQUE" \
-              --arg last_update "$READABLE_TIMESTAMP" \
-              '{tracking_started: $start, last_api_total: $last_total, last_api_unique: $last_unique, cumulative_total: $cum_total, cumulative_unique: $cum_unique, last_updated: $last_update}' > "$STATE_FILE"
-            
             # Save Record
             jq -n \
               --arg repo "$REPO_FULL_NAME" \
               --arg ts "$READABLE_TIMESTAMP" \
               --arg start "$TRACKING_STARTED" \
+              --arg checkpoint "$CHECKPOINT_TIMESTAMP" \
               --argjson c_total "$CURRENT_TOTAL" \
               --argjson c_unique "$CURRENT_UNIQUE" \
               --argjson delta_total "$DELTA_TOTAL" \
               --argjson delta_unique "$DELTA_UNIQUE" \
               --argjson cum_total "$NEW_CUMULATIVE_TOTAL" \
               --argjson cum_unique "$NEW_CUMULATIVE_UNIQUE" \
-              '{repository: $repo, timestamp: $ts, tracking_started: $start, current_period: {total_clones: $c_total, unique_clones: $c_unique}, delta: {total_clones: $delta_total, unique_clones: $delta_unique}, cumulative: {total_clones: $cum_total, unique_clones: $cum_unique}}' > "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
+              '{repository: $repo, timestamp: $ts, tracking_started: $start, checkpoint_date: $checkpoint, current_period: {total_clones: $c_total, unique_clones: $c_unique}, delta_since_checkpoint: {total_clones: $delta_total, unique_clones: $delta_unique}, cumulative: {total_clones: $cum_total, unique_clones: $cum_unique}}' > "analytics/$REPO_NAME/clones_$TIMESTAMP.json"
             
             echo "  > Saved record."
             echo ""
@@ -169,12 +167,16 @@ jobs:
           # Save Ecosystem Totals
           jq -n \
             --arg ts "$READABLE_TIMESTAMP" \
+            --arg checkpoint "$CHECKPOINT_TIMESTAMP" \
+            --argjson checkpoint_total "$CHECKPOINT_TOTAL" \
+            --argjson checkpoint_unique "$CHECKPOINT_UNIQUE" \
             --argjson total "$AGGREGATE_TOTAL" \
             --argjson unique "$AGGREGATE_UNIQUE" \
-            '{timestamp: $ts, ecosystem_totals: {total_clones: $total, unique_clones: $unique}}' > "analytics/aggregate_$TIMESTAMP.json"
+            '{timestamp: $ts, checkpoint_date: $checkpoint, checkpoint_totals: {total_clones: $checkpoint_total, unique_clones: $checkpoint_unique}, ecosystem_totals: {total_clones: $total, unique_clones: $unique}}' > "analytics/aggregate_$TIMESTAMP.json"
           
           echo "====================================="
           echo "Ecosystem-wide Statistics"
+          echo "Checkpoint: $CHECKPOINT_TIMESTAMP ($CHECKPOINT_TOTAL/$CHECKPOINT_UNIQUE)"
           echo "Recorded at: $READABLE_TIMESTAMP"
           echo "Total clones: $AGGREGATE_TOTAL"
           echo "Total unique: $AGGREGATE_UNIQUE"
