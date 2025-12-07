@@ -1,8 +1,7 @@
 {
-  "tracking_started": "2025-11-29 10:34:25 GMT-3",
-  "last_api_total": 12,
-  "last_api_unique": 11,
-  "cumulative_total": 12,
-  "cumulative_unique": 11,
-  "last_updated": "2025-12-07 02:39:53 GMT-3"
+  "repository": "ronniross/eco-datacenter",
+  "last_updated": "2025-12-07 10:30:54 GMT-3",
+  "last_tracked_timestamp": "2025-12-04T00:00:00Z",
+  "cumulative_total": 17,
+  "cumulative_unique": 16
 }
