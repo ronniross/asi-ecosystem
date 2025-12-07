@@ -175,21 +175,31 @@ jobs:
           
           # --- ECOSYSTEM TOTALS ---
           
-          # Load previous ecosystem totals
+          # Load previous ecosystem totals (or use checkpoint if first run after Dec 6)
           LAST_AGGREGATE_FILE=$(ls -t analytics/aggregate_*.json 2>/dev/null | head -1)
           
           if [ -f "$LAST_AGGREGATE_FILE" ]; then
+             # Use the ecosystem total from the last aggregate file
              PREV_ECOSYSTEM_TOTAL=$(jq '.ecosystem_totals.total_clones // 0' "$LAST_AGGREGATE_FILE")
              PREV_ECOSYSTEM_UNIQUE=$(jq '.ecosystem_totals.unique_clones // 0' "$LAST_AGGREGATE_FILE")
              echo "Previous ecosystem total: $PREV_ECOSYSTEM_TOTAL total / $PREV_ECOSYSTEM_UNIQUE unique"
+             
+             # Safeguard: If for some reason the previous total is less than checkpoint, use checkpoint
+             if [ "$PREV_ECOSYSTEM_TOTAL" -lt "$CHECKPOINT_TOTAL" ]; then
+                PREV_ECOSYSTEM_TOTAL=$CHECKPOINT_TOTAL
+                echo "Adjusted to checkpoint baseline: $CHECKPOINT_TOTAL"
+             fi
+             if [ "$PREV_ECOSYSTEM_UNIQUE" -lt "$CHECKPOINT_UNIQUE" ]; then
+                PREV_ECOSYSTEM_UNIQUE=$CHECKPOINT_UNIQUE
+             fi
           else
-             # No previous file - use checkpoint as baseline
+             # No previous aggregate file exists - use checkpoint as starting point
              PREV_ECOSYSTEM_TOTAL=$CHECKPOINT_TOTAL
              PREV_ECOSYSTEM_UNIQUE=$CHECKPOINT_UNIQUE
-             echo "No previous aggregate file - using checkpoint as baseline"
+             echo "First aggregate run - using checkpoint as baseline: $CHECKPOINT_TOTAL total / $CHECKPOINT_UNIQUE unique"
           fi
           
-          # Add ONLY today's delta to previous total
+          # Add today's delta to the previous total
           FINAL_ECOSYSTEM_TOTAL=$((PREV_ECOSYSTEM_TOTAL + GLOBAL_DAILY_DELTA_TOTAL))
           FINAL_ECOSYSTEM_UNIQUE=$((PREV_ECOSYSTEM_UNIQUE + GLOBAL_DAILY_DELTA_UNIQUE))
           
