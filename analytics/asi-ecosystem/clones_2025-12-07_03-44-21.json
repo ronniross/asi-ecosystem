@@ -1,0 +1,26 @@
+{
+  "repository": "ronniross/asi-ecosystem",
+  "timestamp": "2025-12-07 03:44:21 GMT-3",
+  "tracking_started": "2025-11-29 10:34:25 GMT-3",
+  "checkpoint_date": "2025-12-06 00:55:13 GMT-3",
+  "current_period": {
+    "total_clones": 256,
+    "unique_clones": 163
+  },
+  "yesterday_api_period": {
+    "total_clones": 202,
+    "unique_clones": 133
+  },
+  "daily_delta": {
+    "total_clones": 54,
+    "unique_clones": 30
+  },
+  "checkpoint_cumulative": {
+    "total_clones": 205,
+    "unique_clones": 135
+  },
+  "cumulative": {
+    "total_clones": 461,
+    "unique_clones": 298
+  }
+}
