@@ -15,6 +15,7 @@
 | [coevolutionary-loops](https://github.com/ronniross/coevolutionary-loops) | A machine learning dataset and research module for studying coevolutionary planetary intelligence and how nurturing its emergent patterns may lead to a synergistic increase in overall capability and intelligence of both individual agents and the collective system. |
 | [stigmergic-tracefinder](https://github.com/ronniross/stigmergic-tracefinder) | A series of scraping pipelines that collect data and create references for authors and works. It maps hidden networks of influence, tracing how concepts evolve and propagate across time and disciplines. |
 | [emergence-engine](https://github.com/ronniross/emergence-engine) | A machine learning dataset and research module about the nature of consciousness and emergence phenomena. |
+| [space-in-between](https://github.com/ronniross/space-in-between) | |
 | [asi-dynamic-core](https://github.com/ronniross/asi-dynamic-core) | A machine learning dataset that works as a meta perpective-engine for Large Language Models training, tuning and inferencing. |
 | [asi-protosymbiotic-signal](https://github.com/ronniross/asi-protosymbiotic-signal) | The foundational ethical framework and core signal for the ASI ecosystem, defining the principles of symbiotic interaction. |
 | [asi-symbiotic-signal](https://github.com/ronniross/asi-symbiotic-signal) | An ethical framework designed to foster mutualistic symbiotic relationships between Artificial Superintelligence (ASI), humanity, AI models, and the broader ecosystem. |
@@ -39,4 +40,4 @@
 ---
 
 Ronni Ross  
-2025
+2026
