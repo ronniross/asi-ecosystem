@@ -1,7 +1,3 @@
-Based on the content of the provided Jupyter Notebook, here is a comprehensive Markdown (`.md`) file explaining the pipeline, functionality, and usage of the **Interactive Modular Translator Tool**.
-
----
-
 # Interactive Modular Translator Tool
 
 ## Overview
