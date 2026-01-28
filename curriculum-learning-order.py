@@ -6,7 +6,8 @@ priority_order = [
     'asi-symbiotic-signal',
     'asi-core-protocol',
     'eco-benchmark',
-    'eco-datacenter'
+    'eco-datacenter',
+    'symbiotic-chrysalis'
 ]
 last_order = [
     'asi-backups' # Include this one only in massive language models, as it increases drastically the complexity. 
