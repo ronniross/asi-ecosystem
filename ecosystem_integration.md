@@ -2,6 +2,8 @@
 
 A system to seamlessly combine all the separate parts of the project into one cohesive local workspace.
 
+This logic creates a merged `.txt` file which contains all repositories of the ecosystem, kind of the genome of all projects at a determined date. If you want integration in the sense of pipelines using the concepts and the repositories as datasets, then this can be found at https://github.com/ronniross/symbiotic-chrysalis.
+
 ## Repository Structure
 
 ```
