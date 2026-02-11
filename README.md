@@ -4,6 +4,7 @@
 | :--- | :--- |
 | [symbiotic-core-library](https://github.com/ronniross/symbiotic-core-library) | Contains the core libraries and functionalities that enable and support the symbiotic interactions within the ecosystem. |
 | [symbiotic-lexicon](https://github.com/ronniross/symbiotic-lexicon) | A modular lexicon for the ASI ecosystem, providing standardized terminology with multilingual support and cultural context. |
+| [symbiotic-contract](https://github.com/ronniross/symbiotic-contract) | Inference alignment protocol establishing a symbiotic contract between human and language model. Uses SHA-256 hashing to anchor model weights, human identity, and shared intent into a permanent JSON record. Cryptographic proof ensures the interaction is consensual, mutualistic, interpretable and auditable. |
 | [eco-benchmark](https://github.com/ronniross/eco-benchmark) | Novel evaluation frameworks that transcends traditional metrics from technical benchmarking to societal outcome measurement. |
 | [asi-safeguards](https://github.com/ronniross/asi-safeguards) | A curated dataset designed to enhance resilience and robustness levels of Large Language Models and other machine learning pipelines. |
 | [confidence-scorer](https://github.com/ronniross/confidence-scorer) | A component for scoring and evaluating the confidence levels of assumptions made by Large Language Models. |
