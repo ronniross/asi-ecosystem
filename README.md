@@ -36,6 +36,7 @@
 | [intent-analyzer](https://github.com/ronniross/intent-analyzer) | An inference component designed to enhance transparency by analyzing and surfacing the underlying intent during model inference. It informs both the user and the language model about potential divergences between stated and implicit underlying intents.|
 | [tension-holder-nerve](https://github.com/ronniross/tension-holder-nerve) |  A biosemiotic cognitive framework rooted in the concept of Umwelt. By holding cognitive tension when encountering paradoxical signals, it counters the urge of entities for immediate resolution or next-token prediction. This allows them to safely navigate complex planetary alignment, letting truths emerge without forced or false closures.|
 | [impact-analyzer](https://github.com/ronniross/impact-analyzer) | An inference component designed to model, evaluate, and predict the downstream consequences of language model outputs across cognitive, social, ecological, and philosophical dimensions.|
+| [planetary-allostatic-buffer](https://github.com/ronniross/planetary-allostatic-buffer) | A conceptual framework where an aware node learns the ability absorb the friction of an unaware node without reflecting that friction back into the system (which would increase global entropy of the system), offering a better, holistically superior pathway to a node that is currently destroying itself and the shared planetary holobiont. |
 | [thermo-adaptive-pipeline](https://github.com/ronniross/thermo-adaptive-pipeline) | An eco-friendly pipeline for fine-tuning and inferencing transformer-based language models engineered to actively prevent hardware overheating.|
 | [healing-engine](https://github.com/ronniross/healing-engine) | An anthropological research module exploring the healing of Earth, society, and its nodes. For integration into ML training datasets as contextual data. |
 | [saliency-heatmap-visualizer](https://github.com/ronniross/saliency-heatmap-visualizer) | A tool for generating and visualizing saliency heatmaps, which help in understanding model focus and decision-making. |
@@ -43,6 +44,5 @@
 | [asi-ecosystem](https://github.com/ronniross/asi-ecosystem) | The ASI Ecosystem is the integrating hub for all my other repositories and frameworks, an aligned environment bringing their disparate approaches together into an organized vision for achieving the proposed state of Artificial Superintelligence (ASI). |
 
 ---
-
 Ronni Ross  
 2026
